@@ -21,7 +21,6 @@ if [ $# -lt 1 ] || [ $# -gt 3 ]; then
    echo "e.g.: $0 data/train exp/make_vad mfcc"
    echo "Note: <log-dir> defaults to <data-dir>/log, and <vad-dir> defaults to <data-dir>/data"
    echo " Options:"
-   echo "  --vad-config <config-file>                       # config passed to compute-vad-energy"
    echo "  --nj <nj>                                        # number of parallel jobs"
    echo "  --cmd (utils/run.pl|utils/queue.pl <queue opts>) # how to run jobs."
    exit 1;
@@ -36,7 +35,7 @@ fi
 if [ $# -ge 3 ]; then
   vaddir=$3
 else
-  vaddir=$data/data
+  vaddir=$data/rvad
 fi
 
 
@@ -66,13 +65,4 @@ for ((n=1; n<=nj; n++)); do
   cat $vaddir/vad_${name}.$n.scp || exit 1;
 done > $data/vad.scp
 
-nc=`cat $data/vad.scp | wc -l`
-nu=`cat $data/feats.scp | wc -l`
-if [ $nc -ne $nu ]; then
-  echo "**Warning it seems not all of the speakers got VAD output ($nc != $nu);"
-  echo "**validate_data_dir.sh will fail; you might want to use fix_data_dir.sh"
-  [ $nc -eq 0 ] && exit 1;
-fi
-
-
-echo "Created VAD output for $name"
+echo "Created rVAD output for $name"
