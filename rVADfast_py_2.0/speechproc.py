@@ -9,6 +9,7 @@ from scipy.fftpack import dct
 from scipy.signal import lfilter
 from copy import deepcopy
 import code
+import soundfile as sf
 
 #References
 # Z.-H. Tan and B. Lindberg, Low-complexity variable frame rate analysis for speech recognition and voice activity detection.
@@ -16,6 +17,27 @@ import code
 # Achintya Kumar Sarkar and Zheng-Hua Tan 2017
 # Version: 02 Dec 2017
 
+
+def read_audio(str_in):
+    if len(str_in) == 1:
+        if os.path.isfile(str_in[0]) and os.path.splitext(str_in[0])[1]=='wav':
+            return speech_wave(str_in[0])
+        else:
+            return try_read_audio_f(str_in[0])
+    else:
+        # try to find a file-path in the list, if nto found, raise error
+        for maybe_fp in str_in:
+            if os.path.exists(maybe_fp):
+                return try_read_audio_f(maybe_fp)
+        raise Exception("Unable to find valid file in: " + str(str_in))
+
+
+def try_read_audio_f(fpath):
+    try:
+        sig, fs = sf.read(fpath)
+        return fs, sig
+    except:
+        raise Exception('Unable to read file: ' + str(fpath))
 
 
 def speech_wave(fileName_):

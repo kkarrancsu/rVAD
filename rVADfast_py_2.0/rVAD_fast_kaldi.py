@@ -49,9 +49,9 @@ def process_scp(wav_fp, vad_ark, vad_scp):
                 line = line.strip()
                 l_split = line.split()
                 f_id = l_split[0]
-                f_path = l_split[1]
+                f_path_split = l_split[1:]
 
-                vad = compute_rVad(f_path, f_id)
+                vad = compute_rVad(f_path_split, f_id)
                 kaldi_io.write_vec_flt(f_out, vad.astype(np.float32), key=f_id)
                 pbar.update(1)
 
@@ -64,7 +64,8 @@ def compute_rVad(fin_wav, fin_key):
     # finwav=str(sys.argv[1])
     # fvad=str(sys.argv[2])
 
-    fs, data = speechproc.speech_wave(fin_wav)
+    #fs, data = speechproc.speech_wave(fin_wav)
+    fs, data = speechproc.read_audio(fin_wav)
     ft, flen, fsh10, nfr10 =speechproc.sflux(data, fs, winlen, ovrlen, nftt)
 
     # --spectral flatness --
