@@ -48,10 +48,10 @@ name=`basename $data`
 mkdir -p $vaddir || exit 1;
 mkdir -p $logdir || exit 1;
 
-if [ -f $data/vad.scp ]; then
-  mkdir -p $data/.backup
-  echo "$0: moving $data/vad.scp to $data/.backup"
-  mv $data/vad.scp $data/.backup
+if [ -f $vaddir/vad.scp ]; then
+  mkdir -p $vaddir/.backup
+  echo "$0: moving $vaddir/vad.scp to $vaddir/.backup"
+  mv $vaddir/vad.scp $vaddir/.backup
 fi
 
 utils/split_data.sh $data $nj || exit 1;
@@ -63,6 +63,6 @@ $cmd JOB=1:$nj $logdir/vad_${name}.JOB.log \
 
 for ((n=1; n<=nj; n++)); do
   cat $vaddir/vad_${name}.$n.scp || exit 1;
-done > $data/vad.scp
+done > $vaddir/vad.scp
 
 echo "Created rVAD output for $name"

@@ -11,6 +11,9 @@ from copy import deepcopy
 import code
 import soundfile as sf
 
+import subprocess
+import io
+
 #References
 # Z.-H. Tan and B. Lindberg, Low-complexity variable frame rate analysis for speech recognition and voice activity detection.
 # IEEE Journal of Selected Topics in Signal Processing, vol. 4, no. 5, pp. 798-807, 2010.
@@ -18,12 +21,19 @@ import soundfile as sf
 # Version: 02 Dec 2017
 
 
-def read_audio(str_in):
-    if len(str_in) == 1:
-        if os.path.isfile(str_in[0]) and os.path.splitext(str_in[0])[1]=='wav':
-            return speech_wave(str_in[0])
+def read_audio(str_list_in):
+    str_in = ' '.join(str_list_in).strip()
+    if len(str_list_in) == 1:
+        if os.path.isfile(str_list_in[0]) and os.path.splitext(str_list_in[0])[1]=='wav':
+            return speech_wave(str_list_in[0])
         else:
-            return try_read_audio_f(str_in[0])
+            return try_read_audio_f(str_list_in[0])
+    elif str_in.endswith('|'):
+        # from: https://github.com/hitachi-speech/EEND/blob/master/eend/kaldi_data.py#L66
+        p = subprocess.Popen(str_in[:-1], shell=True,
+                             stdout=subprocess.PIPE)
+        sig, fs = sf.read(io.BytesIO(p.stdout.read()), dtype='float32')
+        return fs, sig
     else:
         # try to find a file-path in the list, if nto found, raise error
         for maybe_fp in str_in:
